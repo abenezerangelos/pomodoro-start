@@ -1,0 +1,256 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	
++++ b/main.py	(date 1656253518906)
+@@ -1,6 +1,15 @@
++import tkinter
+ from tkinter import *
+ from time import *
+ from threading import Thread
++#Options
++# TODO 0: First and foremost we have to fix the tick label
++# TODO 1:Try and figure out why the recursion doesn't work properly when the window.update()-(use update_idle() which is a lot better) is included inside the work part i.e. why isn't the break part being expressed
++# TODO 2: Use bind to get around this problem
++# TODO 3: Use threading.event
++# TODO 4: Use "with open as"
++# TODO 5: Regardless try your best to solve this problem with only Todo 1.
++# TODO 6: Try using the App class method and try sending from the main to the thread mainloop
+ # ---------------------------- CONSTANTS ------------------------------- #
+ PINK = "#e2979c"
+ RED = "#e7305b"
+@@ -11,87 +20,149 @@
+ SHORT_BREAK_MIN = 5
+ LONG_BREAK_MIN = 20
+ 
++class Reset:
++   def __init__(self):
++      self.click=False
++
++   def button_command(self):
++      self.click=True
++
++   def timer_command(self):
++      return self.click
++
++
+ # ---------------------------- TIMER RESET ------------------------------- #
+ 
+ 
+ 
++
++
++
++
++
++
++
++
++
+ # ---------------------------- TIMER MECHANISM ------------------------------- #
+ 
+ # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
+-class Work(Thread):
+-   def run(self):
+-       for i in range(4):
+-         print("!!!!")
+-         timer.config(text="Work",fg=GREEN)
+-         start=int(time())
+-         end=int(time())
+-         while end-start<3:
+-           end=time()
+-
+-         Break().start()
+-         if i == 3:
+-             return "exit"
+-
+-
+-
+-array=[1]
+-
+-class Break(Thread):
+-   def run(self):
+-
+-      print("$$$$$$    ")
+-      timer.config(text="Break",fg=PINK)
+-      test=Frame(width = 100,height=50,bg=YELLOW)
+-      test.grid(row=3,column=1)
+-      Label(test,text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN,padx=3).pack(in_=test,side=LEFT)
+-
+-      start = int(time())
+-      end = int(time())
+-      while end - start < 1:
+-        end = time()
+-
+-
+-      array[0]+=1
+-      Break.join()
+-
+-def start_countdown():
+-
+-    print("Ok")
+-
+-    Work().start()
+-    beginning()
+-
+-
+-# def start_countdown():
+-#  for i in range(4):
+-#     print(i)
+-#     timer["text"] = "Work"
+-#     timer["fg"] = GREEN
+-#     window.update()
+-#     start=time()
+-#     end= time()
+-#     while end-start<=3:
+-#        end=time()
+-#        print(end - start)
+-#     timer["text"]="Break"
+-#     timer["fg"]=PINK
+-#     test = Frame(window,width=100, height=50, bg=YELLOW)
+-#     test.grid(row=3,column=1)
+-#     Label(test,text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN,padx=3).pack(in_=test,side=LEFT)
+-#     # counter = Label(text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN)
+-#     # counter.grid(row=3, column=1)
+-#     window.update()
+-#     start=time()
+-#     end=time()
+-#     while end-start<=1:
+-#        end=time()
+-#        print(end-start)
+-#     if i ==1:
+-#        window.destroy()
+-#        beginning()
++# class Work(Thread):
++#    def run(self):
++#        for i in range(4):
++#          print("!!!!")
++#          timer.config(text="Work",fg=GREEN)
++#          start=int(time())
++#          window.update()
++#          end=int(time())
++#          while end-start<3:
++#            end=time()
++#
++#          Break().run()
++#
++#
++#          if i == 1:
++#              return "exit"
++#
++#
++#
++# array=[1]
++#
++# class Break(Thread):
++#    def run(self):
++#
++#       print("$$$$$$    ")
++#       timer.config(text="Break",fg=PINK)
++#       test=Frame(width = 100,height=50,bg=YELLOW)
++#       test.grid(row=3,column=1)
++#       Label(test,text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN,padx=3).pack(in_=test,side=LEFT)
++#
++#       start = int(time())
++#       end = int(time())
++#       while end - start < 1:
++#         end = time()
++#
++#
++#
++#       array[0]+=1
++#
++#
++# def start_countdown():
++#
++#     print("Ok")
++#     work=Work()
++#     work.start()
++#     work.join()
++#     #needs to wait until the iteration is done
++#     beginning()
++
++
++def start_countdown():
++
++
++ for i in range(4):
++    print(i)
++    timer["text"] = "Work"
++    timer["fg"] = GREEN
++    window.update()
++    start=time()
++    end= time()
++
++    def looper(end):
++       reset = timer_reset.timer_command()
++       print("Work\n",reset,"\nWork")
++       if end-start<=15 and not reset:
++          end=time()
++          print(end-start)
++          time()
++          window.after(1000,looper,end)
++       elif reset:
++          window.destroy()
++          beginning()
++       else:
++          pass
++    looper(end)
++    # while (end-start<=15 and not reset):
++    #    end=time()
++    #    reset = timer_reset.timer_command()
++    #    sleep(0.1)
++    #    print(end-start)
++    #    print(reset)
++
++
++
++
++    sleep(0.01)
++    timer["text"]="Break"
++    timer["fg"]=PINK
++    test = Frame(window,width=100, height=50, bg=YELLOW)
++    test.grid(row=3,column=1)
++    Label(test,text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN,padx=3).pack(in_=test,side=LEFT)
++    # counter = Label(text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN)
++    # counter.grid(row=3, column=1)
++    window.update()
++    start=time()
++    end=time()
++    reset = timer_reset.timer_command()
++    while end-start<=5 and not reset:
++       end=time()
++       reset = timer_reset.timer_command()
++       print("Break\n", reset, "\nBreak")
++       sleep(0.1)
++       print(end-start)
++       print(reset)
++       if reset:
++           break
++    print("\n",reset,"\n")
++    sleep(0.01)
++    if reset:
++       window.destroy()
++       beginning()
+ 
+ # ---------------------------- UI SETUP ------------------------------- #
+ def beginning():
++   global timer_reset
++   timer_reset=Reset()
+    global window
+    window=Tk(className="Pomodoro")
+    window.title("Pomodoro")
+@@ -110,8 +181,9 @@
+    canvas.grid(row=1,column=1)
+    start=Button(text="Start",highlightthickness=0,borderwidth=0,command=start_countdown)
+    start.grid(row=2,column=0)
+-   end=Button(text="Reset",highlightthickness=0,borderwidth=0)
++   end=Button(text="Reset",highlightthickness=0,borderwidth=0,command=timer_reset.button_command)
+    end.grid(row=2,column=2)
++
+    window.mainloop()
+ 
+ beginning()
