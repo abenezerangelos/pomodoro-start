@@ -135,7 +135,7 @@
 #
 #
 # app = App()
-print('Now we can continue running code while mainloop runs!')
+# print('Now we can continue running code while mainloop runs!')
 # while app.i>0:
 #     app.displayer()
 
@@ -538,76 +538,76 @@ from PIL import Image,ImageTk
 
 
 
-# import threading
-# from queue import Queue
-# import timeit
-#
-# q = Queue()
-# number = 5
-#
-# t1 = timeit.default_timer()
-# # Step1: For example, we are running multiple functions normally
-# result = []
-# def fun(x):
-#     result.append(x)
-#     return x
-#
-# for i in range(number):
-#     fun(i)
-# print (result ," # normal result")
-# print (timeit.default_timer() - t1)
-#
-# t2 = timeit.default_timer()
-#
-# #Step2:  by using threads and queue
-#
-# def fun_thrd(x,q):
-#     q.put(x)
-#     return
-# for i in range(number):
-#     t1 = threading.Thread(target = fun_thrd, args=(i,q))
-#     t1.start()
-#     t1.join()
-#
-# thrd_result = []
-#
-# while True:
-#     if not q.empty():
-#      thrd_result.append(q.get())
-#     else:
-#        break
-#
-# print (thrd_result , "# result with threads involved")
-# print (timeit.default_timer() - t2)
-#
-# t3 = timeit.default_timer()
-#
-# #step :3 if you want thread to be run without depending on the previous thread
-#
-# threads = []
-#
-# def fun_thrd_independent(x,q):
-#     q.put(x)
-#     return
-#
-# def thread_indep(number):
-#     for i in range(number):
-#         t = threading.Thread(target = fun_thrd_independent, args=(i,q))
-#         t.start()
-#         threads.append(t)
-#
-# thread_indep(5)
-#
-# for j in threads:
-#     j.join()
-#
-# thread_indep_result = []
-#
-# while True:
-#     if not q.empty():
-#         thread_indep_result.append(q.get())
-#     else:
-#        break
-#
-# print (thread_indep_result) # result when threads are independent on each other
-# print (timeit.default_timer() - t3)
+import threading
+from queue import Queue
+import timeit
+
+q = Queue()
+number = 5
+
+t1 = timeit.default_timer()
+# Step1: For example, we are running multiple functions normally
+result = []
+def fun(x):
+    result.append(x)
+    return x
+
+for i in range(number):
+    fun(i)
+print (result ," # normal result")
+print (timeit.default_timer() - t1)
+
+t2 = timeit.default_timer()
+
+#Step2:  by using threads and queue
+
+def fun_thrd(x,q):
+    q.put(x)
+    return
+for i in range(number):
+    t1 = threading.Thread(target = fun_thrd, args=(i,q))
+    t1.start()
+    t1.join()
+
+thrd_result = []
+
+while True:
+    if not q.empty():
+     thrd_result.append(q.get())
+    else:
+       break
+
+print (thrd_result , "# result with threads involved")
+print (timeit.default_timer() - t2)
+
+t3 = timeit.default_timer()
+
+#step :3 if you want thread to be run without depending on the previous thread
+
+threads = []
+
+def fun_thrd_independent(x,q):
+    q.put(x)
+    return
+
+def thread_indep(number):
+    for i in range(number):
+        t = threading.Thread(target = fun_thrd_independent, args=(i,q))
+        t.start()
+        threads.append(t)
+
+thread_indep(5)
+
+for j in threads:
+    j.join()
+
+thread_indep_result = []
+
+while True:
+    if not q.empty():
+        thread_indep_result.append(q.get())
+    else:
+       break
+
+print (thread_indep_result) # result when threads are independent on each other
+print (timeit.default_timer() - t3)

@@ -21,18 +21,18 @@ LONG_BREAK_MIN = 0.25*60
 beginning = True
 
 
-end_window=False
 while beginning==True:
     start_work = [time()]
     i=[4]
+
     identifier="Work"
-    with open("button_click", mode="w") as reset:
-        reset.write("Not Clicked")
+    with open("button_click", mode="w") as button:
+        button.write("Not Clicked")
 
 
     def button_click():
-        with open("button_click", mode="w") as reset:
-            reset.write("Clicked")
+        with open("button_click", mode="w") as writer:
+            writer.write("Clicked")
 
 
     def timer_mechanism(identifier, value, dif):
@@ -44,27 +44,35 @@ while beginning==True:
         print(value)
         print(counter)
 
-        if identifier == "Work" and int(dif) == 0:
-
+        if identifier == "Work":
+         if int(dif)==0:
             timer.config(text="Work", fg=GREEN)
-            window.deiconify()
-            window.attributes("-topmost", 1)
-            window.attributes("-topmost", 0)
 
-        elif (identifier == "Break" or identifier == "Long Break") and int(dif) == 0:
+         elif int(dif)==int(value):
+             if i[0] == 4:
+                 global frame
+                 frame = Frame(window, width=20, height=20, bg=YELLOW)
+                 frame.grid(row=3, column=1)
+             tick = Label(frame, text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN)
+             tick.pack(side=LEFT)
+             window.deiconify()
+             window.attributes("-topmost", 1)
+             window.attributes("-topmost", 0)
+
+
+
+        elif (identifier == "Break" or identifier == "Long Break") :
+         if int(dif)==0:
             print(dif, "IT AIN'T MFING ", 0, "SO SHUSH PLEASE!!!")
-            timer.config(text="Break", fg=PINK)
+            if identifier=="Break":
+                timer.config(text="Break", fg=PINK)
+            elif identifier=="Long Break":
+                timer.config(text="Break",fg=RED)
+         if int(dif)==int(value):
+             window.deiconify()
+             window.attributes("-topmost", 1)
+             window.attributes("-topmost", 0)
 
-            if i[0] == 4:
-                global frame
-                frame = Frame(window, width=20, height=20)
-                frame.grid(row=3, column=1)
-
-            tick = Label(frame, text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN)
-            tick.pack(side=LEFT)
-            window.deiconify()
-            window.attributes("-topmost", 1)
-            window.attributes("-topmost", 0)
         if counter < 60 :
             if counter / 1 < 10:
                 canvas.itemconfig(clock_counter, text=(f"00:0{int(counter / 1)}"))
@@ -103,7 +111,7 @@ while beginning==True:
             # keep listening to the function that receives from the button while doing an after for the 25 min and 10 min respectively.3
 
             # the solution to this problem is to break up the after process instead of doing it all at the same time make use of small increments so that this after could finish withing a second or two and then go to another function that contains all the timer_reset.click values update and come everytime until we reach a limit somewhere probably an array value that will be updated until we get to the 25 minute mark so this insures as the signal from the button will be accepted.
-            execute(WORK_MIN,"Work")
+            execute(WORK_MIN, "Work")
 
             # start=time()
             # end=time()
@@ -176,6 +184,8 @@ while beginning==True:
 
 
             if identifier == "Work":
+
+
                 # if i[0]==1:
                 #     counter[0]=LONG_BREAK_MIN
                 # else:
@@ -195,8 +205,9 @@ while beginning==True:
         window.destroy()
 
     print(beginning)
-    print(end_window)
+
     window = Tk(className="Pomodoro")
+
     window.title("Pomodoro")
     window.config(pady=50, padx=100, bg=YELLOW)
 
