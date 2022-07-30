@@ -2,6 +2,23 @@
 from tkinter import *
 from time import *
 from threading import Thread
+# Options
+# TODO 0: Fix the tick label first, DONE
+# TODO 1: DONE, Try and figure out why the recursion doesn't work properly when the window.update()-(use update_idle() which is a lot better) is included inside the work part i.e. why isn't the break part being expressed
+# So to do this part my idea is to set the countdown using after method inside a start countdown method and in this method also starting the timer mechanism with the same button and even destroying and starting the whole UI using after methodand we can basically use the mainloop to continually check if the value of self.reset has changed. And so we will be able to update and therefore reset the whole window including the frame or any other widget.
+# TODO 2:Hopefully done soon,  Use bind to get around this problem
+# TODO 3:We will see,  Use threading.event
+# TODO 4: DONE, Use "with open as"
+# TODO 5: DONE, Regardless try your best to solve this problem with only Todo 1.
+# TODO Tip: Will be done soon, possibly, hopefully, Use a combination of TODO 2,3 and 6 to achieve a very seamless and perfectly functioning program.
+# TODO 6: This doesn't really work, sorry, Try using the App class method and try sending from the main to the thread mainloop
+# TODO 7:Will take some time,  Add the pause functionality, when pressing the start button twice and if pressed again it would function like the play button. so if button is pressed i.e. button_pressed%2==0
+# TODO 8: Easily DONE, Don't let pressing start once the program has started have any effects, basically make it unfunctional except for when starting the program from the beginning or reset.
+# TODO 9: DONE, Instead of using the after callback instead use the OS time to keep track of the countdown and also manage the transition between Work and Break because you don't want your time to be fast or slow depending on other processes, if we want a program that is efficient we want to tie it to the OS Kernel time.
+# TODO 10:DONE, ADD SOUND, for notification puposes! if possible let it have its own administrative access for sound where it uses maximum volume to notify. This part might be a little too advanced but this is the beauty of programming, the hill, feel me!
+# Improvement for "todo 9, kinda done, not the sound part, if you can't another very specific os timer just use time.time() function and make it work and also make your application use sound
+# TODO 11:(Will do almost already done, ez, I don't see the applicability- actually instead ask the user if they want to stop or start another round of the timer) ADD STOP/END feature when the app ends for a small amount of time, and on top of that try removing the last break and replace it with the end/stop feature.
+# TODO 12:(Tried my best, except for the fact that I haven't tried any of the threading, event or binding strategies just yet) Make sure this program uses as minimum of resources as possible, make sure it doesn't heavily interfere with other apps and your os as much as possible. Either find a data sturcture that is more efficient than a list or update the strategy you are using to count. Maybe threading or binding might fix it all.
 
 
 PINK = "#e2979c"
@@ -9,9 +26,9 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
-WORK_MIN = 0.25*60
-SHORT_BREAK_MIN = 0.125*60
-LONG_BREAK_MIN = 0.25*60
+WORK_MIN = 25*60
+SHORT_BREAK_MIN = 5*60
+LONG_BREAK_MIN = 20*60
 
 # This file will also be an attempt to not use any global or list values.
 # you might try the technique of self-reference when implementing the after method but once you get done with the execute-mirror/bounce strategy.
@@ -54,6 +71,7 @@ while beginning==True:
                  frame = Frame(window, width=20, height=20, bg=YELLOW)
                  frame.grid(row=3, column=1)
              tick = Label(frame, text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN)
+             tick.bell()
              tick.pack(side=LEFT)
              window.deiconify()
              window.attributes("-topmost", 1)
@@ -120,7 +138,7 @@ while beginning==True:
             #     timer_reset.click=timer_reset.timer_command()
 
         else:
-            window.destroy()
+                window.destroy()
 
 
     def rest():
@@ -193,6 +211,7 @@ while beginning==True:
                 rest()
             if identifier == "Break" or identifier == "Long Break":
                 # counter[0] = WORK_MIN
+                window.bell()
                 start_countdown()
 
 
