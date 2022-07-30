@@ -135,12 +135,11 @@
 # root.mainloop()
 #Import tkinter library
 from tkinter import *
-from PIL import Image,ImageTk
 #Create an instance of tkinter frame
 # win = Tk()
 # #Set the geometry
 # win.geometry("750x250")
-# #Create a Text WIdget
+# #Create a Text Widget
 # text= Text(win, width= 30, height= 10)
 # text.insert(INSERT, "Hello World!")
 # #Activate the focus
@@ -155,7 +154,7 @@ from PIL import Image,ImageTk
 
 from tkinter import *
 from time import *
-
+from winsound import *
 from threading import Thread
 
 # Options
@@ -182,9 +181,9 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
-WORK_MIN = 0.25*60
-SHORT_BREAK_MIN = 0.125*60
-LONG_BREAK_MIN = 0.25*60
+WORK_MIN = 25*60
+SHORT_BREAK_MIN = 5*60
+LONG_BREAK_MIN = 20*60
 
 
 # class Reset:
@@ -215,12 +214,10 @@ def button_click():
 # ichecker = False # should be deprecated, not necessarily useful given the fact that you can just use the time to check if it was the start and then activate based on that.
 def timer_mechanism(identifier,value,dif):
     minute=0
-    print(i)
+
     value=int(value)
     counter=int(value-dif)
     print(dif,"CLOCK DIFFERENCE BETWEEN START AND END")
-    print(value)
-    print(counter)
 
     if identifier=="Work" and int(dif)==0 :
 
@@ -230,21 +227,24 @@ def timer_mechanism(identifier,value,dif):
         window.attributes("-topmost", 0)
 
     elif (identifier=="Break" or identifier=="Long Break")and int(dif)==0:
-        print(dif, "IT AIN'T MFING ",0, "SO SHUSH PLEASE!!!")
-        timer.config(text="Break", fg=PINK)
+        if identifier=="Break":
+            timer.config(text="Break", fg=PINK)
 
+        if identifier=="Long Break":
+            timer.config(text="Break", fg=RED)
         if i[0]==3:
             global frame
             frame = Frame(window, width=20, height=20)
             frame.grid(row=3, column=1)
             keeper=[Frame]
         tick = Label(frame, text="✔", font=(FONT_NAME, 12, "bold"), bg=YELLOW, fg=GREEN)
+        tick.bell()
         tick.pack(side=LEFT)
         window.deiconify()
         window.attributes("-topmost", 1)
         window.attributes("-topmost", 0)
         # ichecker=False
-
+    print(f"\n2.{identifier}, {dif}, {counter}.\nThis helps debugging with the long break and the destruction of the old window and start of new one\n")
     if counter<60 :
       if counter/1<10:
         canvas.itemconfig(clock_counter, text=(f"00:0{int(counter/1)}"))
@@ -387,15 +387,35 @@ i = [4]
 def start_countdown():
     with open("button_click") as reset:
         timer_reset=reset.read()
-    start_work[0]=time()
-    if timer_reset!="Clicked" and i[0] > 0:
+    global count_identifier
+
+    global rest_pause
+    print(rest_pause, "!!!!", count_identifier, "$$$$$$")
+    if count_identifier==0 or (rest_pause==False and timer["text"]=="Break") :
+
+        start_work[0]=time()
+    else:
+        global counter_dif
+        start_work[0]=time()-counter_dif-1
+
+
+    if count_identifier%2==1:
+        global after_object
+
+
+        window.after_cancel(after_object)
+    elif timer_reset!="Clicked" and i[0] >= 0 and count_identifier%2==0:
 
         # keep listening to the function that receives from the button while doing an after for the 25 min and 10 min respectively.3
 
 
 
         # the solution to this problem is to break up the after process instead of doing it all at the same time make use of small increments so that this after could finish withing a second or two and then go to another function that contains all the timer_reset.click values update and come everytime until we reach a limit somewhere probably an array value that will be updated until we get to the 25 minute mark so this insures as the signal from the button will be accepted.
-        execute("Work")
+
+        if rest_pause==True:
+            rest()
+        else:
+            execute("Work")
 
         # start=time()
         # end=time()
@@ -407,6 +427,7 @@ def start_countdown():
         window.destroy()
         reset_allvalues()
         beginning()
+    count_identifier += 1
 def reset_allvalues():
 
     i[0] = 4
@@ -415,17 +436,27 @@ def reset_allvalues():
     # counter[0]=WORK_MIN
 
 def rest():
-
+    global rest_pause
     with open("button_click") as reset:
         timer_reset=reset.read()
-    print(timer_reset, "DEBUG")
-    start_work[0]=time()
-    if timer_reset=="Not Clicked":
-        print(i[0])
-        if i[0] >1:
+
+    global count_identifier
+    if count_identifier==1 or timer["text"]=="Work":
+        print("\n1.",timer["text"],"\n")
+        start_work[0]=time()
+    else:
+        global counter_dif
+        start_work[0]=time()-counter_dif-1
+
+    if timer_reset=="Not Clicked" and i[0]>=0:
+        #logic is a bit complicated not that simple, it is not easy to read but idk y i really like it but it shouldn't be this way, code usually shouldn't have a lot of global variables and logic shouldn't be tangled up
+        #one thing that is costing us readability is using the adder variables at the end of the function actually bring it up it will be way easier that way giving us a clear distinction between functions.
+        if i[0] >1 or i[0]==1 and rest_pause==True:
 
             execute("Break")
-        elif i[0] ==1:
+        # i feel like we can make this code look a lot cleaner than it is supposed to be, mainly by adding the self-referencing variables to the beginnning of the function
+
+        elif (i[0] ==0 and rest_pause==True) or (i[0]==1 and rest_pause==False):
             execute("Long Break")
 
 
@@ -441,44 +472,48 @@ def rest():
         window.destroy()
         reset_allvalues()
         beginning()
-    i[0] -= 1
-    print(i)
-    print(start_work)
+    if rest_pause!=True:
+        i[0] -= 1
+
+    rest_pause=True
+
+
 # counter=[WORK_MIN]
 #create one function that keeps calling time and opening the button_click file every once in a while checking to see if the time.time() inside the function minus the initial outside the function equal to the amount and for the timer mechanism just substract the difference from the initial WORK_MIN or BREAK_MIN.
 #given that we can actually use the with open as function right now as is with the "button_click" array. The with open as function is just substituting our Reset() class and nothing else.
 
 def execute(identifier):
+    global after_object
     if identifier=="Work":
-        window.after(1000,mirror,WORK_MIN,identifier)
+        after_object=window.after(1000,mirror,WORK_MIN,identifier)
 
     if identifier=="Break":
-        print("working at some point")
-        print(i)
-        print(start_work)
-        window.after(1000,mirror,SHORT_BREAK_MIN,identifier)
+
+        after_object=window.after(1000,mirror,SHORT_BREAK_MIN,identifier)
     if identifier=="Long Break":
-        window.after(1000,mirror,LONG_BREAK_MIN,identifier)
+        after_object=window.after(1000,mirror,LONG_BREAK_MIN,identifier)
+    print(after_object, 333333333333333333333333333333333333333333333333333333333333333333333333333333)
 
 def mirror(value,identifier):
-    print("WHATEVER, JUST PLEASE WORK!")
+
     value=int(value)
+
     with open("button_click") as reset:
         timer_reset=reset.read()
-    print(timer_reset,"DEBUG2!!!")
+
     end=time()
+    global counter_dif
     counter_dif=int(end-start_work[0]-1)
-    print(int(value),"EVERY STEP OF THE WAY!")
+
     if timer_reset=="Clicked":
         window.destroy()
         reset_allvalues()
         beginning()
     elif counter_dif<value:#elif counter[0]>=1:
-        print("this is working too")
+
         timer_mechanism(identifier=identifier,value=value,dif=counter_dif)
         # print(button_click)
         if identifier=="Break":
-            print("this is working three")
             execute("Break")
         if identifier=="Long Break":
             execute("Long Break")
@@ -492,14 +527,33 @@ def mirror(value,identifier):
 
         timer_mechanism(identifier=identifier, value=value, dif=counter_dif)
         if identifier=="Work":
+            global rest_pause
             # if i[0]==1:
             #     counter[0]=LONG_BREAK_MIN
             # else:
             #     counter[0] = SHORT_BREAK_MIN
+            rest_pause=False
+            global count_identifier
+            count_identifier=1
+
+
+
+            counter_dif=0
             rest()
-        if identifier=="Break" or identifier=="Long Break":
+        if identifier=="Break" :
             # counter[0] = WORK_MIN
+
+            count_identifier=0
+
+            counter_dif = 0
+            rest_pause=False
             start_countdown()
+        if identifier=="Long Break":
+            sleep(0.5)
+            Beep(1000,1000)
+            window.destroy()
+            reset_allvalues()
+            beginning()
 
 
 
@@ -521,8 +575,10 @@ def beginning():
     global clock_counter
     clock_counter=canvas.create_text(100, 120, text="00:00", fill="white", font=(FONT_NAME, 35, "bold"))
     canvas.grid(row=1, column=1)
-
-
+    global rest_pause
+    rest_pause=False
+    global count_identifier
+    count_identifier=0
     start = Button(text="Start", highlightthickness=0, borderwidth=0, command=start_countdown)
     start.grid(row=2, column=0)
     end = Button(text="Reset", highlightthickness=0, borderwidth=0, command=button_click)
