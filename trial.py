@@ -388,29 +388,30 @@ i = [4]
 
 
 def start_countdown():
+    #this module and in particular this function disables the start button from doing anything again once started.
     with open("button_click") as reset:
         timer_reset=reset.read()
     global count_identifier
 
     global rest_pause
-    print(rest_pause, "!!!!", count_identifier, "$$$$$$")
+
     if count_identifier==0 or (rest_pause==False and timer["text"]=="Break") :
 
         start_work[0]=time()
-    else:
-        global counter_dif
-        try:
-            start_work[0]=time()-counter_dif-1
-        except:
-            start_work[0]=time()
+    # else:
+    #     global counter_dif
+    #     try:
+    #         start_work[0]=time()-counter_dif-1
+    #     except:
+    #         start_work[0]=time()
 
 
-    if count_identifier%2==1:
-        global after_object
-
-
-        window.after_cancel(after_object)
-    elif timer_reset!="Clicked" and i[0] >= 0 and count_identifier%2==0:
+    # if count_identifier%2==1:
+    #     global after_object
+    #
+    #
+    #     window.after_cancel(after_object)
+    if timer_reset!="Clicked" and i[0] >= 0 and count_identifier==0:
 
         # keep listening to the function that receives from the button while doing an after for the 25 min and 10 min respectively.3
 
@@ -429,22 +430,29 @@ def start_countdown():
         #     end=time()
         #     timer_reset.click=timer_reset.timer_command()
 
+    elif timer_reset=="Clicked"or i[0]<0:
+        reset_func()
     else:
-        window.destroy()
-        reset_allvalues()
-        beginning()
+        pass
     count_identifier += 1
-def reset_allvalues():
+def reset_func():
 
     i[0] = 4
     with open("button_click",mode="w") as reset:
          reset.write("Not Clicked")
+    print("DESTRUCTION!!!!!")
+    window.destroy()
+    beginning()
     # counter[0]=WORK_MIN
 
 def rest():
     global rest_pause
+    global only_once
     with open("button_click") as reset:
         timer_reset=reset.read()
+    if rest_pause!=True:
+        i[0] -= 1
+        only_once = True
 
     global count_identifier
     if count_identifier==1 or timer["text"]=="Work":
@@ -457,32 +465,25 @@ def rest():
     if timer_reset=="Not Clicked" and i[0]>=0:
         #logic is a bit complicated not that simple, it is not easy to read but idk y i really like it but it shouldn't be this way, code usually shouldn't have a lot of global variables and logic shouldn't be tangled up
         #one thing that is costing us readability is using the adder variables at the end of the function actually bring it up it will be way easier that way giving us a clear distinction between functions.
-        if i[0] >1 or i[0]==1 and rest_pause==True:
+        if i[0] >0 :
             print(f"\n4.What is its value before execution {rest_pause}")
             execute("Break")
             print(f"5. What is its value after: {rest_pause}\n")
         # i feel like we can make this code look a lot cleaner than it is supposed to be, mainly by adding the self-referencing variables to the beginnning of the function
 
-        elif (i[0] ==0 and rest_pause==True) or (i[0]==1 and rest_pause==False):
+        elif i[0]==0:
             execute("Long Break")
 
 
 
         else:
-            print("DESTRUCTION")
-            window.destroy()
-            reset_allvalues()
-            beginning()
+            reset_func()
 
     else:
-        print("DESTRUCTION!!!!!")
-        window.destroy()
-        reset_allvalues()
-        beginning()
-    if rest_pause!=True:
-        i[0] -= 1
-        global only_once
-        only_once=True
+
+        reset_func()
+
+
 
     rest_pause=True
 
@@ -503,7 +504,7 @@ def execute(identifier):
         print(f"\n7. This is right after the after_object: {rest_pause}\n")
     if identifier=="Long Break":
         after_object=window.after(500,mirror,LONG_BREAK_MIN,identifier)
-    print(after_object, 333333333333333333333333333333333333333333333333333333333333333333333333333333)
+
 
 def mirror(value,identifier):
 
@@ -517,9 +518,7 @@ def mirror(value,identifier):
     counter_dif=int(end-start_work[0]-1)
 
     if timer_reset=="Clicked":
-        window.destroy()
-        reset_allvalues()
-        beginning()
+        reset_func()
     elif counter_dif<value:#elif counter[0]>=1:
         print(f"\n8. Debugger {rest_pause}, this should be absolutely false")
         timer_mechanism(identifier=identifier,value=value,dif=counter_dif)
@@ -562,10 +561,9 @@ def mirror(value,identifier):
             start_countdown()
         if identifier=="Long Break":
             sleep(0.5)
-            Beep(1000,1500)
-            window.destroy()
-            reset_allvalues()
-            beginning()
+            Beep(500,1500)
+            reset_func()
+
 
 
 
