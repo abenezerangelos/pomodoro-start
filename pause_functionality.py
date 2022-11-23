@@ -29,9 +29,9 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
-WORK_MIN = 0.25*60
-SHORT_BREAK_MIN = 0.125*60
-LONG_BREAK_MIN = 0.25*60
+WORK_MIN = 25*60
+SHORT_BREAK_MIN = 5*60
+LONG_BREAK_MIN = 20*60
 
 
 # class Reset:
