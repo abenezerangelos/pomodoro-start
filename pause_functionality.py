@@ -60,6 +60,8 @@ def button_click():
 # ---------------------------- TIMER MECHANISM ------------------------------- #
 from winsound import *
 # ichecker = False # should be deprecated, not necessarily useful given the fact that you can just use the time to check if it was the start and then activate based on that.
+
+deiconifier=0
 def timer_mechanism(identifier,value,dif):
     minute=0
 
@@ -68,14 +70,16 @@ def timer_mechanism(identifier,value,dif):
 
     global rest_pause
     global only_once
-    print(f"\n3.This is the one thing that shouldn't be changing before hand: {rest_pause} \n")
+
     if identifier=="Work" and int(dif)==0 :
 
         timer.config(text="Work", fg=GREEN)
-        window.deiconify()
-        window.attributes("-topmost", 1)
-        window.attributes("-topmost", 0)
-
+        global deiconifier
+        if deiconifier>10:
+            window.deiconify()
+            window.attributes("-topmost", 1)
+            window.attributes("-topmost", 0)
+        deiconifier+=1
     elif (identifier=="Break" or identifier=="Long Break") and only_once==True:
         if identifier=="Break":
             timer.config(text="Break", fg=PINK)
@@ -95,7 +99,7 @@ def timer_mechanism(identifier,value,dif):
         window.attributes("-topmost", 0)
         only_once=False
         # ichecker=False
-    print(f"\n2.{identifier}, {dif}, {counter}.\nThis helps debugging with the long break and the destruction of the old window and start of new one\n")
+
     if counter<60 :
       if counter/1<10:
         canvas.itemconfig(clock_counter, text=(f"00:0{int(counter/1)}"))
@@ -284,7 +288,7 @@ def reset_func():
     i[0] = 4
     with open("button_click",mode="w") as reset:
          reset.write("Not Clicked")
-    print("DESTRUCTION!!!!!")
+
     window.destroy()
     beginning()
     # counter[0]=WORK_MIN
@@ -300,7 +304,7 @@ def rest():
 
     global count_identifier
     if count_identifier==1 or timer["text"]=="Work":
-        print("\n1.",timer["text"],"\n")
+
         start_work[0]=time()
     else:
         global counter_dif
@@ -310,9 +314,9 @@ def rest():
         #logic is a bit complicated not that simple, it is not easy to read but idk y i really like it but it shouldn't be this way, code usually shouldn't have a lot of global variables and logic shouldn't be tangled up
         #one thing that is costing us readability is using the adder variables at the end of the function actually bring it up it will be way easier that way giving us a clear distinction between functions.
         if i[0] >0 :
-            print(f"\n4.What is its value before execution {rest_pause}")
+
             execute("Break")
-            print(f"5. What is its value after: {rest_pause}\n")
+
         # i feel like we can make this code look a lot cleaner than it is supposed to be, mainly by adding the self-referencing variables to the beginnning of the function
 
         elif i[0]==0:
@@ -343,9 +347,9 @@ def execute(identifier):
         after_object=window.after(500,mirror,WORK_MIN,identifier)
 
     if identifier=="Break":
-        print(f"\n6.This is before the after_object executes: {rest_pause}\n")
+
         after_object=window.after(500,mirror,SHORT_BREAK_MIN,identifier)
-        print(f"\n7. This is right after the after_object: {rest_pause}\n")
+
     if identifier=="Long Break":
         after_object=window.after(500,mirror,LONG_BREAK_MIN,identifier)
 
@@ -364,9 +368,9 @@ def mirror(value,identifier):
     if timer_reset=="Clicked":
         reset_func()
     elif counter_dif<value:#elif counter[0]>=1:
-        print(f"\n8. Debugger {rest_pause}, this should be absolutely false")
+
         timer_mechanism(identifier=identifier,value=value,dif=counter_dif)
-        print(f"9. Debugger {rest_pause}, this should be absolutely false, so shall does this.\n")
+
         # print(button_click)
         if identifier=="Break":
             execute("Break")
@@ -378,7 +382,7 @@ def mirror(value,identifier):
 #         counter[0] -= 1
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^important!
     elif counter_dif>=value:# elif counter[0]<1:
-        print(counter_dif, "=", int(value), "AT THIS POINT!")
+
 
         timer_mechanism(identifier=identifier, value=value, dif=counter_dif)
         if identifier=="Work":
@@ -437,7 +441,6 @@ def beginning():
     start.grid(row=2, column=0)
     end = Button(text="Reset", highlightthickness=0, borderwidth=0, command=button_click)
     end.grid(row=2, column=2)
-    window.deiconify()
     window.attributes("-topmost", 1)
 
     window.mainloop()
